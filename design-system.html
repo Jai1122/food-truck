@@ -1,0 +1,1149 @@
+<title>Family Meal Planner — Design System & UX Spec</title>
+<style>
+  /* ============================================================
+     TOKENS — document chrome (theme-aware via tokens only)
+     ============================================================ */
+  :root{
+    --bg:#FAF7F3; --surface:#FFFFFF; --surface-2:#F3EEE7; --surface-3:#EAE3DA;
+    --ink:#221F1B; --muted:#5C554D; --faint:#948A7C; --line:#EAE3DA;
+    --accent:#2F6B4F;        /* curry-leaf green  */
+    --accent-ink:#1E4C37;
+    --turmeric:#B07A12;      /* turmeric amber    */
+    --coral:#E14B5A;         /* airbnb-warm coral */
+    --tamarind:#9C4A2E;      /* tamarind rust     */
+    --good:#2E7D53; --warn:#B07A12; --crit:#B3261E;
+    --shadow: 20 30 20;
+    --radius:18px;
+    --maxw:1080px;
+    --mono:'SF Mono',ui-monospace,'Roboto Mono',Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#141210; --surface:#1C1A16; --surface-2:#232019; --surface-3:#2A261F;
+      --ink:#ECE7E0; --muted:#B0A89C; --faint:#7C7468; --line:#2E2A22;
+      --accent:#7FD3A2; --accent-ink:#B9EFCE; --turmeric:#F0BE5E; --coral:#FF7A85; --tamarind:#E29A78;
+      --good:#7FD3A2; --warn:#F0BE5E; --crit:#F2B8B5;
+      --shadow: 0 0 0;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#FAF7F3; --surface:#FFFFFF; --surface-2:#F3EEE7; --surface-3:#EAE3DA;
+    --ink:#221F1B; --muted:#5C554D; --faint:#948A7C; --line:#EAE3DA;
+    --accent:#2F6B4F; --accent-ink:#1E4C37; --turmeric:#B07A12; --coral:#E14B5A; --tamarind:#9C4A2E;
+    --good:#2E7D53; --warn:#B07A12; --crit:#B3261E; --shadow:22 26 18;
+  }
+  :root[data-theme="dark"]{
+    --bg:#141210; --surface:#1C1A16; --surface-2:#232019; --surface-3:#2A261F;
+    --ink:#ECE7E0; --muted:#B0A89C; --faint:#7C7468; --line:#2E2A22;
+    --accent:#7FD3A2; --accent-ink:#B9EFCE; --turmeric:#F0BE5E; --coral:#FF7A85; --tamarind:#E29A78;
+    --good:#7FD3A2; --warn:#F0BE5E; --crit:#F2B8B5; --shadow:0 0 0;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;-webkit-font-smoothing:antialiased;font-size:16px}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  /* ---- Type system ---- */
+  h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.12;letter-spacing:-.02em}
+  h2{font-size:clamp(1.7rem,3.2vw,2.4rem);font-weight:680}
+  h3{font-size:1.35rem;font-weight:660;letter-spacing:-.015em}
+  h4{font-size:1.02rem;font-weight:640;letter-spacing:-.01em}
+  p{margin:0}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent);font-weight:600}
+  .lede{font-size:1.12rem;color:var(--muted);max-width:62ch}
+  .muted{color:var(--muted)}
+  a{color:var(--accent-ink)}
+  :root[data-theme="dark"] a,@media (prefers-color-scheme:dark){a{color:var(--accent)}}
+
+  /* ---- Header ---- */
+  header.hero{padding:76px 0 40px;border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(120% 80% at 88% -10%, color-mix(in oklab,var(--turmeric) 16%,transparent), transparent 60%),
+      radial-gradient(90% 70% at 0% 0%, color-mix(in oklab,var(--accent) 12%,transparent), transparent 55%);}
+  .hero h1{font-size:clamp(2.4rem,6vw,4rem);font-weight:720;letter-spacing:-.035em;line-height:1.02}
+  .hero .kok{color:var(--accent)}
+  .hero .sub{margin-top:20px;font-size:1.18rem;color:var(--muted);max-width:60ch}
+  .metarow{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+  .tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;padding:6px 11px;
+    border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface)}
+
+  /* ---- Sticky section nav ---- */
+  nav.toc{position:sticky;top:0;z-index:40;background:color-mix(in oklab,var(--bg) 86%,transparent);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav.toc .wrap{display:flex;gap:4px;overflow-x:auto;padding:10px 24px;scrollbar-width:none}
+  nav.toc .wrap::-webkit-scrollbar{display:none}
+  nav.toc a{color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:560;
+    white-space:nowrap;padding:7px 12px;border-radius:999px}
+  nav.toc a:hover{background:var(--surface-2);color:var(--ink)}
+
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  .sec-head{max-width:66ch;margin-bottom:34px}
+  .sec-head h2{margin-top:10px}
+  .sec-head p{margin-top:12px;color:var(--muted);font-size:1.05rem}
+
+  /* ---- generic cards / grids ---- */
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:820px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;box-shadow:0 1px 2px rgb(var(--shadow) / .05)}
+  .card h4{margin-bottom:6px}
+  .card p{color:var(--muted);font-size:.95rem}
+  .kicker{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+  /* ---- swatches ---- */
+  .swgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .sw{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+  .sw .chip{height:64px}
+  .sw .meta{padding:10px 12px}
+  .sw .role{font-size:.8rem;font-weight:600}
+  .sw .hex{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase}
+
+  /* ---- tables ---- */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  tr:last-child td{border-bottom:none}
+  td code,.ic-code{font-family:var(--mono);font-size:.82rem;color:var(--accent-ink)}
+  :root[data-theme="dark"] td code{color:var(--accent)}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ---- type specimens ---- */
+  .spec{display:flex;align-items:baseline;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .spec .lbl{font-family:var(--mono);font-size:.72rem;color:var(--faint);width:150px;flex:none}
+  .spec .samp{color:var(--ink)}
+
+  /* ---- spacing scale viz ---- */
+  .sp-row{display:flex;align-items:center;gap:14px;padding:7px 0}
+  .sp-bar{background:color-mix(in oklab,var(--accent) 55%,transparent);height:16px;border-radius:4px}
+  .sp-lbl{font-family:var(--mono);font-size:.78rem;color:var(--muted);width:120px}
+
+  /* ============================================================
+     PHONE MOCKUPS — always-accurate light/dark app tokens
+     ============================================================ */
+  .gallery{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+  .phone{--p-bg:#FAF7F3;--p-surf:#FFFFFF;--p-surf1:#F4F0EA;--p-surf2:#ECE6DE;
+    --p-primary:#2F6B4F;--p-onprim:#FFFFFF;--p-primcont:#B7EEC9;--p-onprimcont:#00210F;
+    --p-secont:#DCE8DA;--p-onsecont:#0D1F14;--p-terti:#9A5B00;--p-tercont:#FBE0BC;--p-ontercont:#2E1600;
+    --p-coral:#E14B5A;--p-coralc:#FFE1E1;
+    --p-ink:#221F1B;--p-mut:#5C554D;--p-outline:#A79E93;--p-line:#EAE3DA;
+    --p-err:#B3261E;--p-errc:#FFDAD5;
+    width:300px;border-radius:38px;padding:10px;background:#0c0f0b;
+    box-shadow:0 24px 50px -18px rgb(0 0 0 / .45), 0 0 0 1px rgb(255 255 255 / .04);flex:none}
+  .phone--dark{--p-bg:#141210;--p-surf:#1C1A16;--p-surf1:#232019;--p-surf2:#2B271F;
+    --p-primary:#7FD3A2;--p-onprim:#00391E;--p-primcont:#125230;--p-onprimcont:#9CF0BE;
+    --p-secont:#37493C;--p-onsecont:#D2E8D5;--p-terti:#FFB95C;--p-tercont:#734300;--p-ontercont:#FFDDB6;
+    --p-coral:#FF7A85;--p-coralc:#5C1D22;
+    --p-ink:#ECE7E0;--p-mut:#B7AFA4;--p-outline:#8A8175;--p-line:#2E2A22;
+    --p-err:#FFB4AB;--p-errc:#93000A}
+  .scr{background:var(--p-bg);border-radius:30px;overflow:hidden;color:var(--p-ink);
+    font-size:13px;line-height:1.4;position:relative;height:600px;display:flex;flex-direction:column}
+  .scr.autoh{height:auto}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:9px 18px 2px;
+    font-size:11px;font-weight:600;color:var(--p-ink)}
+  .statusbar .dots{display:flex;gap:3px;align-items:center}
+  .statusbar .dots span{width:5px;height:5px;border-radius:50%;background:var(--p-ink);opacity:.7}
+  .appbar{padding:8px 16px 12px;display:flex;align-items:center;gap:12px}
+  .appbar .title{font-size:20px;font-weight:680;letter-spacing:-.02em}
+  .appbar.large{padding:10px 18px 14px;flex-direction:column;align-items:flex-start;gap:2px}
+  .appbar.large .over{font-size:11.5px;color:var(--p-mut);font-weight:600}
+  .appbar.large .title{font-size:26px}
+  .scrbody{flex:1;overflow:hidden;padding:0 16px}
+  .scr .ico{width:22px;height:22px;flex:none;color:currentColor}
+  .scr .ico-sm{width:18px;height:18px}
+  .navbar{display:flex;justify-content:space-around;align-items:flex-end;gap:2px;
+    padding:8px 6px 12px;background:var(--p-surf1);border-top:1px solid var(--p-line)}
+  .navitem{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--p-mut);flex:1}
+  .navitem .pill{padding:3px 16px;border-radius:999px;display:flex;align-items:center;justify-content:center}
+  .navitem.active{color:var(--p-onsecont)}
+  .navitem.active .pill{background:var(--p-secont)}
+  .navitem span{font-size:10.5px;font-weight:560}
+
+  .mcard{background:var(--p-surf);border:1px solid var(--p-line);border-radius:16px;padding:12px}
+  .thumb{width:52px;height:52px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(140deg,var(--p-primcont),var(--p-secont));color:var(--p-onprimcont)}
+  .thumb.warm{background:linear-gradient(140deg,#FBE3C0,#F4CDBE);color:#8a4a1e}
+  .thumb.photo{background:linear-gradient(150deg,#F4CE9E,#E79A80 52%,#C46F73);color:#fff;position:relative}
+  .thumb svg{width:26px;height:26px}
+  .fav{color:var(--p-coral)}
+  .fav svg{width:20px;height:20px}
+  .fab{position:absolute;right:16px;bottom:78px;background:var(--p-primcont);color:var(--p-onprimcont);
+    width:52px;height:52px;border-radius:17px;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 14px -4px rgb(0 0 0 / .4)}
+  .fab.ext{width:auto;padding:0 18px;gap:8px;font-weight:640;font-size:13.5px}
+  .btn{border-radius:999px;padding:9px 18px;font-size:13px;font-weight:600;display:inline-flex;
+    align-items:center;gap:7px;border:none;cursor:default}
+  .btn.filled{background:var(--p-primary);color:var(--p-onprim)}
+  .btn.tonal{background:var(--p-secont);color:var(--p-onsecont)}
+  .btn.out{background:transparent;color:var(--p-primary);border:1px solid var(--p-outline)}
+  .btn.text{background:transparent;color:var(--p-primary);padding:9px 12px}
+  .chiprow{display:flex;gap:7px;flex-wrap:wrap}
+  .mchip{font-size:11.5px;padding:6px 11px;border-radius:8px;border:1px solid var(--p-outline);
+    color:var(--p-mut);display:inline-flex;gap:5px;align-items:center}
+  .mchip.sel{background:var(--p-secont);color:var(--p-onsecont);border-color:transparent}
+  .mchip.role{border-color:transparent;background:var(--p-surf2)}
+  .slotlabel{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--p-mut)}
+  .daychip{font-size:11px;font-weight:700;color:var(--p-onprimcont);background:var(--p-primcont);
+    width:38px;height:38px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+  .daychip small{font-size:8.5px;font-weight:600;opacity:.8}
+  .alertpill{font-size:10.5px;font-weight:600;color:var(--p-ontercont);background:var(--p-tercont);
+    padding:3px 8px;border-radius:999px;display:inline-flex;gap:4px;align-items:center}
+  .tfield{border:1px solid var(--p-outline);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--p-ink);
+    display:flex;flex-direction:column;gap:2px;background:transparent}
+  .tfield .flab{font-size:10.5px;color:var(--p-primary);font-weight:600}
+  .tfield.focus{border-color:var(--p-primary);border-width:2px;padding:8px 11px}
+  .sheet{background:var(--p-surf1);border-radius:26px 26px 0 0;padding:14px 18px 20px;margin:0 -16px;position:relative}
+  .grab{width:34px;height:4px;border-radius:99px;background:var(--p-outline);opacity:.5;margin:0 auto 12px}
+  .switch{width:38px;height:22px;border-radius:99px;background:var(--p-primary);position:relative;flex:none}
+  .switch::after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--p-onprim)}
+  .switch.off{background:var(--p-surf2);border:1px solid var(--p-outline)}
+  .switch.off::after{left:3px;right:auto;background:var(--p-outline);width:12px;height:12px;top:4px}
+  .skel{background:linear-gradient(90deg,var(--p-surf2) 25%,var(--p-surf1) 50%,var(--p-surf2) 75%);
+    background-size:200% 100%;border-radius:8px}
+  .caption{text-align:center;font-size:.82rem;color:var(--muted);margin-top:12px;font-weight:560}
+  .figpair{display:flex;flex-direction:column;align-items:center}
+
+  /* spec block for screens */
+  .screenspec{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:10px}
+  .screenspec div{background:var(--surface);padding:13px 15px}
+  .screenspec dt{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:4px}
+  .screenspec dd{margin:0;font-size:.88rem;color:var(--muted)}
+  .screenblock{margin-top:44px}
+  .screenblock:first-of-type{margin-top:0}
+  .screenblock > h3{display:flex;align-items:center;gap:10px}
+  .screenblock > h3 .n{font-family:var(--mono);font-size:.85rem;color:var(--accent);border:1px solid var(--line);
+    border-radius:8px;padding:2px 8px}
+
+  /* flow / nav map */
+  .flow{font-family:var(--mono);font-size:.82rem;line-height:1.9;color:var(--muted);
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;overflow-x:auto;white-space:pre}
+  .flow b{color:var(--accent-ink);font-weight:700}
+  :root[data-theme="dark"] .flow b{color:var(--accent)}
+
+  ul.clean{margin:8px 0 0;padding-left:18px}
+  ul.clean li{margin:5px 0;color:var(--muted);font-size:.95rem}
+  ul.clean li b{color:var(--ink);font-weight:620}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  footer{padding:50px 0 80px;color:var(--faint);font-size:.86rem}
+  .callout{border-left:3px solid var(--turmeric);background:color-mix(in oklab,var(--turmeric) 8%,var(--surface));
+    padding:14px 18px;border-radius:0 12px 12px 0;font-size:.95rem;color:var(--muted)}
+  .callout b{color:var(--ink)}
+</style>
+
+<!-- icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ic-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></symbol>
+  <symbol id="ic-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+  <symbol id="ic-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 8v4l3 2"/></symbol>
+  <symbol id="ic-set" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.6-1H2.8a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.6a1.7 1.7 0 0 0 1-1.6V2.8a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 18 4.6a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.7 1z"/></symbol>
+  <symbol id="ic-add" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></symbol>
+  <symbol id="ic-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="ic-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="ic-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></symbol>
+  <symbol id="ic-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12 5 5L20 6"/></symbol>
+  <symbol id="ic-bowl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M12 3c-1.5 1-1.5 2.5 0 3.5"/><path d="M9 4c-1 .7-1 1.7 0 2.4M15 4c-1 .7-1 1.7 0 2.4"/><path d="M4 21h16"/></symbol>
+  <symbol id="ic-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4m0 0 6-6m-6 6 6 6"/></symbol>
+  <symbol id="ic-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3m3 3-3 3M20 16H7l3 3m-3-3 3-3"/></symbol>
+  <symbol id="ic-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.2C.6 9 1.6 5.7 4.6 5c2-.5 3.6.5 4.4 1.8L12 9l3-2.2C15.8 5.5 17.4 4.5 19.4 5c3 .7 4 4 2.6 6.8C19.5 16.4 12 21 12 21z"/></symbol>
+  <symbol id="ic-dosa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15c3-5 15-5 18 0"/><path d="M3 15c3 2.4 15 2.4 18 0"/><circle cx="8" cy="13" r="1"/><circle cx="14" cy="12.4" r="1"/></symbol>
+</svg>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Design System &amp; UX Specification — v1</p>
+    <h1>Family <span class="kok">Meal</span> Planner</h1>
+    <p class="sub">An offline-first Android app that turns "what should we cook tonight?" into a calm, one-tap weekly plan — Material Design 3 underneath, warmed toward an Airbnb feel: cosy neutrals, generous space, and roomy cards.</p>
+    <div class="metarow">
+      <span class="tag">Material Design 3</span>
+      <span class="tag">Airbnb-warm</span>
+      <span class="tag">Kotlin · Jetpack Compose</span>
+      <span class="tag">Light + Dark</span>
+      <span class="tag">Offline · No accounts</span>
+      <span class="tag">Text-forward (imagery: v2)</span>
+      <span class="tag">WCAG AA</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <div class="wrap">
+    <a href="#foundations">Foundations</a>
+    <a href="#warmth">Airbnb warm-up</a>
+    <a href="#color">Color</a>
+    <a href="#type">Typography</a>
+    <a href="#space">Spacing</a>
+    <a href="#shape">Shape &amp; Elevation</a>
+    <a href="#motion">Motion</a>
+    <a href="#icons">Icons</a>
+    <a href="#components">Components</a>
+    <a href="#nav">Navigation</a>
+    <a href="#screens">Screens</a>
+    <a href="#micro">Micro-interactions</a>
+    <a href="#android">Android UX</a>
+    <a href="#handoff">Handoff</a>
+  </div>
+</nav>
+
+<!-- ============ ADAPTATIONS ============ -->
+<section id="foundations">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">How this brief was tailored</p>
+      <h2>A journey shaped to an offline app</h2>
+      <p>The requested journey assumes a networked, account-based product. This app was deliberately designed <b>fully offline with no sign-in</b>, so three items were adapted rather than bolted on — clarity beats checklist-completeness.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><span class="kicker">Removed</span><h4>Authentication &amp; Logout</h4><p>No accounts, no server, nothing to sign into. Data lives on-device. Sharing happens through a file, not a login. Removing these screens removes friction and a privacy surface.</p></div>
+      <div class="card"><span class="kicker">Reframed</span><h4>Profile → Household</h4><p>"Profile" becomes a lightweight <b>Household</b> card: family size (default 4), enabled meal slots, and the repeat-alert window. Local preferences, not an identity.</p></div>
+      <div class="card"><span class="kicker">Reframed</span><h4>Notifications → Reminders</h4><p>No push. Optional <b>local reminders</b> ("Plan next week", set for Sunday morning) via the on-device scheduler. Off by default; opt-in in Settings.</p></div>
+    </div>
+    <div style="margin-top:22px" class="callout"><b>Design north star.</b> The moment that must feel effortless is <b>opening the app and seeing this week already handled</b>. Every other screen exists to feed that one. Reduce decisions, never add them.</div>
+  </div>
+</section>
+
+<!-- ============ AIRBNB WARM-UP ============ -->
+<section id="warmth">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Visual direction</p>
+      <h2>The Airbnb warm-up</h2>
+      <p>Same Material 3 bones, warmer skin. Airbnb's feel isn't a colour — it's <b>warm neutrals, roomy layouts, and calm cards</b>. We keep the curry-leaf green as the primary (it's food-right and we validated it), and warm everything around it. A muted <b>coral</b> appears only as a sparing accent (e.g. the "today" marker), never as the main action. <b>Dish imagery is deferred to a future iteration</b> — v1 cards are clean and text-forward.</p>
+    </div>
+
+    <div class="grid g4" style="margin-bottom:26px">
+      <div class="card"><span class="kicker">Neutrals</span><h4>Cosy greige</h4><p>Cool green-grey surfaces → warm off-white (#FAF7F3) and warm greys. Text is a warm near-black (#221F1B), like Airbnb's.</p></div>
+      <div class="card"><span class="kicker">Space</span><h4>Room to breathe</h4><p>Bigger cards, larger headings, more air between rows. The UI recedes; the food leads.</p></div>
+      <div class="card"><span class="kicker">Imagery — later</span><h4>Deferred to v2</h4><p>Category illustrations &amp; optional dish photos are <b>parked for a future iteration</b>. v1 leads with type on warm surfaces.</p></div>
+      <div class="card"><span class="kicker">Accent</span><h4>Coral, sparingly</h4><p>A single warm coral (#E14B5A) for small highlights like the "today" marker. Green still owns primary actions.</p></div>
+    </div>
+
+    <div class="gallery">
+      <!-- warm photo-forward combos list -->
+      <div class="figpair">
+      <div class="phone"><div class="scr">
+        <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+        <div class="appbar large"><span class="over">28 MEALS · YOUR KITCHEN</span><div style="display:flex;width:100%;align-items:center;justify-content:space-between"><span class="title">Combos</span><svg class="ico" style="color:var(--p-mut)"><use href="#ic-set"/></svg></div></div>
+        <div class="scrbody">
+          <div class="mcard" style="display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--p-surf);border-radius:999px;margin-bottom:14px"><svg class="ico-sm" style="color:var(--p-mut)"><use href="#ic-search"/></svg><span style="color:var(--p-outline);font-size:12.5px">Search your dishes</span></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="mcard" style="display:flex;align-items:center;gap:13px;padding:11px"><div style="flex:1"><div style="font-weight:660;font-size:14px">Idly + Coconut Chutney</div><div style="font-size:11.5px;color:var(--p-mut);margin-top:2px">Base · Chutney · Breakfast</div></div></div>
+            <div class="mcard" style="display:flex;align-items:center;gap:13px;padding:11px"><div style="flex:1"><div style="font-weight:660;font-size:14px">Dosa + Sambar</div><div style="font-size:11.5px;color:var(--p-mut);margin-top:2px">Base · Side · Breakfast</div></div></div>
+            <div class="mcard" style="display:flex;align-items:center;gap:13px;padding:11px"><div style="flex:1"><div style="font-weight:660;font-size:14px">Pongal + Sambar</div><div style="font-size:11.5px;color:var(--p-mut);margin-top:2px">Base · Side · Breakfast</div></div></div>
+          </div>
+        </div>
+        <div class="fab" style="background:var(--p-primary);color:var(--p-onprim)"><svg class="ico"><use href="#ic-add"/></svg></div>
+        <div class="navbar">
+          <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-cal"/></svg></div><span>This Week</span></div>
+          <div class="navitem active"><div class="pill"><svg class="ico-sm"><use href="#ic-bowl"/></svg></div><span>Combos</span></div>
+          <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-list"/></svg></div><span>Items</span></div>
+          <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-history"/></svg></div><span>History</span></div>
+        </div>
+      </div></div>
+      <p class="caption">Combos, warmed · clean text-forward rows on cosy surfaces</p>
+      </div>
+
+      <!-- warm This Week with thumbnails, dark -->
+      <div class="figpair">
+      <div class="phone phone--dark"><div class="scr">
+        <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+        <div class="appbar large"><span class="over">JUL 5 – JUL 11 · THIS WEEK</span><div style="display:flex;width:100%;align-items:center;justify-content:space-between"><span class="title">This Week</span><svg class="ico" style="color:var(--p-mut)"><use href="#ic-set"/></svg></div></div>
+        <div class="scrbody">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="mcard" style="display:flex;gap:12px;align-items:center;padding:11px"><div style="flex:1"><div class="slotlabel">Sun 5 · Breakfast</div><div style="font-weight:660;font-size:14px;margin-top:1px">Idly + Coconut Chutney</div></div><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-swap"/></svg></div>
+            <div class="mcard" style="display:flex;gap:12px;align-items:center;padding:11px;border-color:var(--p-tercont)"><div style="flex:1"><div class="slotlabel">Mon 6 · Breakfast</div><div style="font-weight:660;font-size:14px;margin-top:1px">Dosa + Coconut Chutney</div><div style="margin-top:5px"><span class="alertpill"><svg class="ico-sm" style="width:12px;height:12px"><use href="#ic-history"/></svg>Coconut chutney · 1 day ago</span></div></div></div>
+            <div class="mcard" style="display:flex;gap:12px;align-items:center;padding:11px"><div style="flex:1"><div class="slotlabel">Tue 7 · Breakfast</div><div style="font-weight:660;font-size:14px;margin-top:1px">Pongal + Sambar</div></div><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-swap"/></svg></div>
+          </div>
+        </div>
+        <div class="fab ext"><svg class="ico-sm"><use href="#ic-swap"/></svg>Generate week</div>
+        <div class="navbar">
+          <div class="navitem active"><div class="pill"><svg class="ico-sm"><use href="#ic-cal"/></svg></div><span>This Week</span></div>
+          <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-bowl"/></svg></div><span>Combos</span></div>
+          <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-list"/></svg></div><span>Items</span></div>
+          <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-history"/></svg></div><span>History</span></div>
+        </div>
+      </div></div>
+      <p class="caption">This Week, warmed · roomy day cards, coral "today" accent</p>
+      </div>
+    </div>
+
+    <div style="margin-top:24px" class="callout"><b>What we deliberately did not change.</b> Green stays the primary; Material 3 components, navigation, sheets and snackbars are untouched; accessibility contrast still passes AA. This is a re-skin of warmth and spacing, not a rebrand — exactly the "keep MD3, warm it up" call. <b>Dish imagery is deferred</b> to a future iteration. <b>Cereal</b> (Airbnb's face) is proprietary, so a friendly geometric sans substitutes; personality comes from spacing and weight.</div>
+  </div>
+</section>
+
+<!-- ============ COLOR ============ -->
+<section id="color">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Foundations · 01</p>
+      <h2>Colour — a kitchen, not a brand deck</h2>
+      <p>The seed is <b>curry-leaf green</b> — appetising and fresh without the terracotta cliché every food app reaches for. Neutrals are now <b>warm greige</b> (Airbnb-cosy off-white and warm greys, warm near-black text) rather than green-tinted. <b>Turmeric amber</b> stays reserved for the repeat-alert; a muted <b>coral</b> is a sparing accent (e.g. the "today" marker). Full Material 3 tonal roles below, for both themes.</p>
+    </div>
+
+    <h4 style="margin-bottom:12px">Light theme — key roles</h4>
+    <div class="swgrid swgrid-l">
+      <div class="swgrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+        <div class="sw"><div class="chip" style="background:#2F6B4F"></div><div class="meta"><div class="role" style="color:#2F6B4F">Primary</div><div class="hex">#2F6B4F</div></div></div>
+        <div class="sw"><div class="chip" style="background:#B3F0CC"></div><div class="meta"><div class="role">Primary container</div><div class="hex">#B3F0CC</div></div></div>
+        <div class="sw"><div class="chip" style="background:#4E6355"></div><div class="meta"><div class="role">Secondary</div><div class="hex">#4E6355</div></div></div>
+        <div class="sw"><div class="chip" style="background:#D5E8D8"></div><div class="meta"><div class="role">Secondary container</div><div class="hex">#D5E8D8</div></div></div>
+        <div class="sw"><div class="chip" style="background:#9A5B00"></div><div class="meta"><div class="role" style="color:#9A5B00">Tertiary (turmeric)</div><div class="hex">#9A5B00</div></div></div>
+        <div class="sw"><div class="chip" style="background:#E14B5A"></div><div class="meta"><div class="role" style="color:#E14B5A">Coral accent</div><div class="hex">#E14B5A</div></div></div>
+        <div class="sw"><div class="chip" style="background:#B3261E"></div><div class="meta"><div class="role" style="color:#B3261E">Error</div><div class="hex">#B3261E</div></div></div>
+        <div class="sw"><div class="chip" style="background:#FAF7F3;box-shadow:inset 0 0 0 1px #EAE3DA"></div><div class="meta"><div class="role">Surface (warm)</div><div class="hex">#FAF7F3</div></div></div>
+        <div class="sw"><div class="chip" style="background:#F4F0EA;box-shadow:inset 0 0 0 1px #EAE3DA"></div><div class="meta"><div class="role">Surf. container</div><div class="hex">#F4F0EA</div></div></div>
+        <div class="sw"><div class="chip" style="background:#221F1B"></div><div class="meta"><div class="role">On surface</div><div class="hex">#221F1B</div></div></div>
+        <div class="sw"><div class="chip" style="background:#5C554D"></div><div class="meta"><div class="role">On surface variant</div><div class="hex">#5C554D</div></div></div>
+        <div class="sw"><div class="chip" style="background:#A79E93"></div><div class="meta"><div class="role">Outline</div><div class="hex">#A79E93</div></div></div>
+      </div>
+    </div>
+
+    <h4 style="margin:28px 0 12px">Dark theme — key roles</h4>
+    <div class="swgrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
+      <div class="sw"><div class="chip" style="background:#7FD3A2"></div><div class="meta"><div class="role" style="color:#3f6f55">Primary</div><div class="hex">#7FD3A2</div></div></div>
+      <div class="sw"><div class="chip" style="background:#125230"></div><div class="meta"><div class="role">Primary container</div><div class="hex">#125230</div></div></div>
+      <div class="sw"><div class="chip" style="background:#B5CCBB"></div><div class="meta"><div class="role">Secondary</div><div class="hex">#B5CCBB</div></div></div>
+      <div class="sw"><div class="chip" style="background:#37493C"></div><div class="meta"><div class="role">Secondary container</div><div class="hex">#37493C</div></div></div>
+      <div class="sw"><div class="chip" style="background:#FFB95C"></div><div class="meta"><div class="role" style="color:#8a6320">Tertiary (turmeric)</div><div class="hex">#FFB95C</div></div></div>
+      <div class="sw"><div class="chip" style="background:#FF7A85"></div><div class="meta"><div class="role" style="color:#b0565e">Coral accent</div><div class="hex">#FF7A85</div></div></div>
+      <div class="sw"><div class="chip" style="background:#FFB4AB"></div><div class="meta"><div class="role">Error</div><div class="hex">#FFB4AB</div></div></div>
+      <div class="sw"><div class="chip" style="background:#141210"></div><div class="meta"><div class="role">Surface (warm)</div><div class="hex">#141210</div></div></div>
+      <div class="sw"><div class="chip" style="background:#232019"></div><div class="meta"><div class="role">Surf. container</div><div class="hex">#232019</div></div></div>
+      <div class="sw"><div class="chip" style="background:#ECE7E0"></div><div class="meta"><div class="role">On surface</div><div class="hex">#ECE7E0</div></div></div>
+      <div class="sw"><div class="chip" style="background:#B7AFA4"></div><div class="meta"><div class="role">On surface variant</div><div class="hex">#B7AFA4</div></div></div>
+      <div class="sw"><div class="chip" style="background:#8A8175"></div><div class="meta"><div class="role">Outline</div><div class="hex">#8A8175</div></div></div>
+    </div>
+
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card"><span class="kicker">Semantic ≠ accent</span><h4>Turmeric is a signal</h4><p>Amber never decorates. It means "repeat detected." Keeping it rare makes it legible the instant it appears.</p></div>
+      <div class="card"><span class="kicker">Contrast</span><h4>AA verified</h4><p>Every text/background pair meets ≥4.5:1 (body) or ≥3:1 (large / UI). Primary on white = 4.7:1; on-surface = 14:1.</p></div>
+      <div class="card"><span class="kicker">Dynamic colour</span><h4>Material You ready</h4><p>These are the brand fallback. On Android 12+, honour the user's wallpaper palette; keep turmeric as a fixed custom role.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TYPE ============ -->
+<section id="type">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Foundations · 02</p>
+      <h2>Typography</h2>
+      <p>The Material 3 type scale, delivered in the platform UI face (<b>Roboto</b> on Android, San Francisco in this preview). Personality comes from the <b>scale and weight discipline</b>, not decoration: big friendly headlines, quiet labels, generous line-height for one-handed reading.</p>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 24px">
+      <div class="spec"><span class="lbl">Display S · 36/44 · 400</span><span class="samp" style="font-size:36px;font-weight:600;letter-spacing:-.02em">This week is handled</span></div>
+      <div class="spec"><span class="lbl">Headline M · 28/36 · 400</span><span class="samp" style="font-size:28px;font-weight:600;letter-spacing:-.015em">Sunday dinner</span></div>
+      <div class="spec"><span class="lbl">Title L · 22/28 · 500</span><span class="samp" style="font-size:22px;font-weight:600">Idly + Coconut Chutney</span></div>
+      <div class="spec"><span class="lbl">Title M · 16/24 · 500</span><span class="samp" style="font-size:16px;font-weight:600">Add a new combo</span></div>
+      <div class="spec"><span class="lbl">Body L · 16/24 · 400</span><span class="samp" style="font-size:16px">Pick the items that make up this meal.</span></div>
+      <div class="spec"><span class="lbl">Body M · 14/20 · 400</span><span class="samp" style="font-size:14px;color:var(--muted)">You last cooked this 4 days ago.</span></div>
+      <div class="spec"><span class="lbl">Label L · 14/20 · 500</span><span class="samp" style="font-size:14px;font-weight:600;color:var(--accent)">Generate week</span></div>
+      <div class="spec" style="border-bottom:none"><span class="lbl">Label S · 11/16 · 500</span><span class="samp" style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)">Breakfast</span></div>
+    </div>
+    <div class="tablewrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Role</th><th>Size / Line</th><th>Weight</th><th>Tracking</th><th>Used for</th></tr></thead>
+        <tbody class="num">
+          <tr><td>Display Small</td><td>36 / 44</td><td>400–600</td><td>-0.02em</td><td>Empty-state hero, splash wordmark</td></tr>
+          <tr><td>Headline Medium</td><td>28 / 36</td><td>400</td><td>-0.015em</td><td>Large app-bar titles ("This Week")</td></tr>
+          <tr><td>Title Large</td><td>22 / 28</td><td>500</td><td>0</td><td>Combo names, detail headers</td></tr>
+          <tr><td>Title Medium</td><td>16 / 24</td><td>500</td><td>+0.01em</td><td>List row titles, dialog titles</td></tr>
+          <tr><td>Body Large</td><td>16 / 24</td><td>400</td><td>+0.03em</td><td>Primary reading text, field input</td></tr>
+          <tr><td>Body Medium</td><td>14 / 20</td><td>400</td><td>+0.02em</td><td>Secondary text, helper copy</td></tr>
+          <tr><td>Label Large</td><td>14 / 20</td><td>500</td><td>+0.01em</td><td>Buttons, tabs, nav labels</td></tr>
+          <tr><td>Label Small</td><td>11 / 16</td><td>500</td><td>+0.05em</td><td>Slot headers, overlines, chips</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPACING ============ -->
+<section id="space">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Foundations · 03</p>
+      <h2>Spacing — an 8dp grid</h2>
+      <p>All layout snaps to an 8dp rhythm, with a 4dp half-step for tight component internals. Screen margins are 16dp; cards pad 16dp; sections breathe at 24–32dp. Touch targets never drop below 48×48dp.</p>
+    </div>
+    <div class="two">
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px">
+        <div class="sp-row"><span class="sp-lbl">4dp · half-step</span><span class="sp-bar" style="width:4px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">8dp · base</span><span class="sp-bar" style="width:8px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">12dp</span><span class="sp-bar" style="width:12px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">16dp · gutter</span><span class="sp-bar" style="width:16px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">24dp · section</span><span class="sp-bar" style="width:24px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">32dp</span><span class="sp-bar" style="width:32px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">48dp · min touch</span><span class="sp-bar" style="width:48px"></span></div>
+        <div class="sp-row"><span class="sp-lbl">64dp</span><span class="sp-bar" style="width:64px"></span></div>
+      </div>
+      <div>
+        <ul class="clean">
+          <li><b>Screen margin</b> — 16dp left/right, always.</li>
+          <li><b>Between cards</b> — 12dp in dense lists, 16dp in feeds.</li>
+          <li><b>Card padding</b> — 16dp; 12dp for compact rows.</li>
+          <li><b>App bar → content</b> — 8dp under compact bars, 16dp under large bars.</li>
+          <li><b>Icon ↔ label</b> — 8dp; <b>label groups</b> — 4dp.</li>
+          <li><b>Above bottom nav</b> — 88dp scroll padding so the last row and FAB clear the bar.</li>
+          <li><b>Thumb zone</b> — primary actions (FAB, Generate, nav) sit in the lower third for one-handed reach.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SHAPE + ELEVATION ============ -->
+<section id="shape">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Foundations · 04</p>
+      <h2>Shape &amp; elevation</h2>
+      <p>Rounded, soft, friendly — but restrained. Elevation is expressed mostly through <b>tonal surface colour</b> (M3 surface-container tiers), with real shadows reserved for the FAB and floating sheets. No heavy drop-shadows.</p>
+    </div>
+    <div class="grid g4" style="margin-bottom:20px">
+      <div class="card" style="text-align:center"><div style="height:56px;border-radius:4px;background:var(--surface-3);border:1px solid var(--line);margin-bottom:10px"></div><div class="role" style="font-size:.85rem;font-weight:600">4dp · XS</div><p style="font-size:.82rem">Chips, small tags</p></div>
+      <div class="card" style="text-align:center"><div style="height:56px;border-radius:12px;background:var(--surface-3);border:1px solid var(--line);margin-bottom:10px"></div><div class="role" style="font-size:.85rem;font-weight:600">12dp · M</div><p style="font-size:.82rem">Cards, text fields, FAB</p></div>
+      <div class="card" style="text-align:center"><div style="height:56px;border-radius:16px;background:var(--surface-3);border:1px solid var(--line);margin-bottom:10px"></div><div class="role" style="font-size:.85rem;font-weight:600">16dp · L</div><p style="font-size:.82rem">Combo cards, containers</p></div>
+      <div class="card" style="text-align:center"><div style="height:56px;border-radius:28px 28px 6px 6px;background:var(--surface-3);border:1px solid var(--line);margin-bottom:10px"></div><div class="role" style="font-size:.85rem;font-weight:600">28dp · XL</div><p style="font-size:.82rem">Bottom sheets, dialogs</p></div>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Level</th><th>dp</th><th>Surface tint</th><th>Shadow</th><th>Where</th></tr></thead>
+        <tbody class="num">
+          <tr><td>0</td><td>0</td><td>surface</td><td>none</td><td>Page background, scrolled content</td></tr>
+          <tr><td>1</td><td>1</td><td>surface-container-low</td><td>0 1 2 / 5%</td><td>Resting cards</td></tr>
+          <tr><td>2</td><td>3</td><td>surface-container</td><td>0 1 3 / 8%</td><td>Search bar, raised list</td></tr>
+          <tr><td>3</td><td>6</td><td>surface-container-high</td><td>0 4 8 / 12%</td><td>FAB resting, menus</td></tr>
+          <tr><td>4–5</td><td>8–12</td><td>surface-container-highest</td><td>0 8 16 / 16%</td><td>Bottom sheet, dialog, dragged FAB</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MOTION ============ -->
+<section id="motion">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Foundations · 05</p>
+      <h2>Motion</h2>
+      <p>Motion should feel like the app is <b>helping</b>, not performing. Short, spatial, purposeful — and fully honoured under <code class="ic-code">prefers-reduced-motion</code> (cross-fades replace movement).</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Token</th><th>Duration</th><th>Easing</th><th>Applied to</th></tr></thead>
+        <tbody class="num">
+          <tr><td>Micro</td><td>100ms</td><td>standard</td><td>Ripple, checkbox tick, chip select</td></tr>
+          <tr><td>Short</td><td>200ms</td><td>emphasized-decelerate</td><td>FAB press, snackbar in</td></tr>
+          <tr><td>Medium</td><td>300ms</td><td>emphasized</td><td>Shared-axis screen transitions, bottom sheet</td></tr>
+          <tr><td>Long</td><td>400–500ms</td><td>emphasized</td><td>"Generate week" reveal, container transform</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:14px;font-size:.92rem">Easing tokens — <b>standard</b> <code class="ic-code">cubic-bezier(.2,0,0,1)</code> · <b>emphasized</b> <code class="ic-code">cubic-bezier(.2,0,0,1)</code> in, <code class="ic-code">cubic-bezier(.3,0,.8,.15)</code> accel · <b>emphasized-decelerate</b> <code class="ic-code">cubic-bezier(.05,.7,.1,1)</code>.</p>
+  </div>
+</section>
+
+<!-- ============ ICONS ============ -->
+<section id="icons">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Foundations · 06</p>
+      <h2>Iconography</h2>
+      <p><b>Material Symbols · Rounded</b>, weight 400, optical size 24, grade 0. Rounded matches the soft shape language. Filled variant marks the active bottom-nav destination; outlined everywhere else. 24dp glyph inside a 48dp target.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Purpose</th><th>Symbol name</th><th>Purpose</th><th>Symbol name</th></tr></thead>
+        <tbody>
+          <tr><td>This Week (nav)</td><td><code>calendar_month</code></td><td>Combos (nav)</td><td><code>restaurant</code></td></tr>
+          <tr><td>Items (nav)</td><td><code>lists</code> / <code>egg_alt</code></td><td>History (nav)</td><td><code>history</code></td></tr>
+          <tr><td>Settings</td><td><code>settings</code></td><td>Add / FAB</td><td><code>add</code></td></tr>
+          <tr><td>Search</td><td><code>search</code></td><td>Filter</td><td><code>tune</code></td></tr>
+          <tr><td>Swap a slot</td><td><code>swap_horiz</code></td><td>Repeat alert</td><td><code>schedule</code> / <code>replay</code></td></tr>
+          <tr><td>Export / share</td><td><code>ios_share</code></td><td>Import</td><td><code>download</code></td></tr>
+          <tr><td>Edit</td><td><code>edit</code></td><td>Delete</td><td><code>delete</code></td></tr>
+          <tr><td>Overflow menu</td><td><code>more_vert</code></td><td>Back</td><td><code>arrow_back</code></td></tr>
+          <tr><td>Confirm</td><td><code>check</code></td><td>Dismiss</td><td><code>close</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPONENTS ============ -->
+<section id="components">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Component library</p>
+      <h2>Building blocks</h2>
+      <p>Every component rendered here uses live app tokens, shown in light and dark. These are the exact atoms the screens are assembled from.</p>
+    </div>
+
+    <!-- buttons -->
+    <h4 style="margin-bottom:14px">Buttons &amp; chips</h4>
+    <div class="gallery" style="gap:22px">
+      <div class="phone" style="width:330px"><div class="scr autoh"><div class="scrbody" style="padding:20px 18px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="btn filled">Generate week</span><span class="btn tonal">Swap</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="btn out">Add item</span><span class="btn text">Cancel</span></div>
+        <div class="chiprow"><span class="mchip role"><svg class="ico-sm"><use href="#ic-bowl"/></svg>Base</span><span class="mchip role">Chutney</span><span class="mchip role">Side</span></div>
+        <div class="chiprow"><span class="mchip sel"><svg class="ico-sm"><use href="#ic-check"/></svg>Vegetarian</span><span class="mchip">Breakfast</span><span class="mchip">Quick</span></div>
+      </div></div></div>
+      <div class="phone phone--dark" style="width:330px"><div class="scr autoh"><div class="scrbody" style="padding:20px 18px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="btn filled">Generate week</span><span class="btn tonal">Swap</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="btn out">Add item</span><span class="btn text">Cancel</span></div>
+        <div class="chiprow"><span class="mchip role"><svg class="ico-sm"><use href="#ic-bowl"/></svg>Base</span><span class="mchip role">Chutney</span><span class="mchip role">Side</span></div>
+        <div class="chiprow"><span class="mchip sel"><svg class="ico-sm"><use href="#ic-check"/></svg>Vegetarian</span><span class="mchip">Breakfast</span><span class="mchip">Quick</span></div>
+      </div></div></div>
+    </div>
+
+    <!-- fields + controls -->
+    <h4 style="margin:30px 0 14px">Text fields, toggles &amp; feedback</h4>
+    <div class="gallery" style="gap:22px">
+      <div class="phone" style="width:330px"><div class="scr autoh"><div class="scrbody" style="padding:20px 18px;display:flex;flex-direction:column;gap:14px">
+        <div class="tfield focus"><span class="flab">Combo name</span><span>Idly + Coconut Chutney</span></div>
+        <div class="tfield"><span class="flab" style="color:var(--p-mut)">Item name</span><span style="color:var(--p-outline)">e.g. Tomato Chutney</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Repeat alerts</span><span class="switch"></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--p-mut)">Sunday reminder</span><span class="switch off"></span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="skel" style="width:20px;height:20px;border-radius:6px"></span><span class="skel" style="height:12px;flex:1"></span></div>
+        <div style="background:var(--p-surf2);color:var(--p-ink);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:center;font-size:12.5px"><svg class="ico-sm" style="color:var(--p-primary)"><use href="#ic-check"/></svg>Combo saved <span style="margin-left:auto;color:var(--p-primary);font-weight:600">Undo</span></div>
+      </div></div></div>
+      <div class="phone phone--dark" style="width:330px"><div class="scr autoh"><div class="scrbody" style="padding:20px 18px;display:flex;flex-direction:column;gap:14px">
+        <div class="tfield focus"><span class="flab">Combo name</span><span>Idly + Coconut Chutney</span></div>
+        <div class="tfield"><span class="flab" style="color:var(--p-mut)">Item name</span><span style="color:var(--p-outline)">e.g. Tomato Chutney</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span>Repeat alerts</span><span class="switch"></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--p-mut)">Sunday reminder</span><span class="switch off"></span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span class="skel" style="width:20px;height:20px;border-radius:6px"></span><span class="skel" style="height:12px;flex:1"></span></div>
+        <div style="background:var(--p-surf2);color:var(--p-ink);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:center;font-size:12.5px"><svg class="ico-sm" style="color:var(--p-primary)"><use href="#ic-check"/></svg>Combo saved <span style="margin-left:auto;color:var(--p-primary);font-weight:600">Undo</span></div>
+      </div></div></div>
+    </div>
+
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card"><span class="kicker">Buttons</span><h4>One primary per screen</h4><p>Filled = the single most important action. Tonal for secondary, outlined/text for tertiary. Never two filled buttons competing.</p></div>
+      <div class="card"><span class="kicker">Chips</span><h4>Role vs filter</h4><p>Assist/role chips label an item's role; filter chips (with check) narrow lists. Same shape, different jobs — kept visually distinct by fill.</p></div>
+      <div class="card"><span class="kicker">Feedback</span><h4>Snackbar, not toast</h4><p>Destructive-adjacent actions (delete, replace) always offer <b>Undo</b> in a snackbar for ~5s before committing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NAVIGATION ============ -->
+<section id="nav">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Structure</p>
+      <h2>Navigation map &amp; user flow</h2>
+      <p>Four top-level destinations in a bottom navigation bar — reachable one-handed, flat, no nested tabs. Settings sits in the app-bar (rarely visited). Adaptive: the bar becomes a <b>navigation rail</b> on foldables / large screens ≥600dp.</p>
+    </div>
+
+    <div class="two" style="gap:24px;align-items:start">
+      <div>
+        <h4 style="margin-bottom:10px">Navigation map</h4>
+        <div class="flow">Bottom navigation (4)
+├─ <b>This Week</b>  ◀ start destination
+│    ├─ Generate week
+│    ├─ Slot → swap / fill / clear
+│    └─ Reminder banner (opt-in)
+├─ <b>Combos</b>
+│    ├─ Search + filter by role/tag
+│    ├─ Combo → detail / edit
+│    └─ ＋ New combo  (FAB)
+├─ <b>Items</b>
+│    ├─ Grouped by role
+│    ├─ Item → edit
+│    └─ ＋ New item  (FAB)
+└─ <b>History</b>
+     └─ Past weeks (read-only)
+
+App bar (global)
+└─ <b>Settings</b>
+     ├─ Household (size, slots)
+     ├─ Repeat window
+     ├─ Reminders
+     ├─ Export  ▸ share sheet
+     ├─ Import  ▸ merge / replace
+     └─ Help &amp; About</div>
+      </div>
+      <div>
+        <h4 style="margin-bottom:10px">Primary flow — plan a week</h4>
+        <div class="flow"><b>Launch</b>
+   │  splash (brand, ~600ms)
+   ▼
+First run? ──yes──▶ <b>Onboarding</b> (3)
+   │no                    │ seed starter dishes?
+   ▼                      ▼
+<b>This Week</b> ◀───────────┘
+   │
+   │ tap "Generate week"
+   ▼
+Plan fills (staggered) ── any blanks? ──▶ hint: "Add more combos"
+   │
+   │ tap a slot
+   ▼
+<b>Bottom sheet</b>: Swap · Fill · Clear
+   │            │
+   │ repeat? ──▶ amber alert inline
+   ▼
+Snackbar "Updated · Undo"
+
+<b>Share flow</b>
+Settings ▶ Export ▶ scope sheet
+   ▶ Android share ▶ (mom) Import
+   ▶ merge / replace ▶ done</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREENS ============ -->
+<section id="screens">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Screen specifications</p>
+      <h2>The screens</h2>
+      <p>Each screen below carries a rendered mockup plus its full spec — purpose, hierarchy, states, motion, accessibility, and edge cases. Mockups shown in the theme that best reads each screen; every screen ships in both.</p>
+    </div>
+
+    <!-- SCREEN 1: Splash + Onboarding -->
+    <div class="screenblock">
+      <h3><span class="n">01</span> Splash &amp; Onboarding</h3>
+      <p class="muted" style="margin-top:8px;max-width:70ch">A near-instant brand moment, then a 3-card first-run intro that teaches the model (items → combos → week) and drops you straight into adding your <b>first</b> dish. Your library is yours from the start — no bundled recipes.</p>
+      <div class="gallery" style="margin-top:20px">
+        <div class="figpair">
+          <div class="phone"><div class="scr" style="height:560px;background:var(--p-primary);color:var(--p-onprim);align-items:center;justify-content:center">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+              <div style="width:76px;height:76px;border-radius:24px;background:var(--p-onprim);display:flex;align-items:center;justify-content:center"><svg style="width:42px;height:42px;color:var(--p-primary)"><use href="#ic-bowl"/></svg></div>
+              <div style="font-size:22px;font-weight:700;letter-spacing:-.02em">Meal Planner</div>
+            </div>
+            <div style="padding-bottom:34px;font-size:11px;opacity:.8">for the family of four</div>
+          </div></div>
+          <p class="caption">Splash — logo scales in, settles</p>
+        </div>
+        <div class="figpair">
+          <div class="phone"><div class="scr" style="height:560px">
+            <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <div class="scrbody" style="display:flex;flex-direction:column;padding:24px 22px">
+              <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:20px">
+                <div style="width:120px;height:120px;border-radius:28px;background:var(--p-primcont);display:flex;align-items:center;justify-content:center"><svg style="width:60px;height:60px;color:var(--p-onprimcont)"><use href="#ic-cal"/></svg></div>
+                <div style="font-size:26px;font-weight:680;letter-spacing:-.02em;line-height:1.15">Never ask<br>"what's for dinner?"</div>
+                <p style="color:var(--p-mut);font-size:14px;margin:0">Keep your family's dishes in one place and let the app plan the week — offline, private, yours.</p>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:8px">
+                <div style="display:flex;gap:6px"><span style="width:20px;height:6px;border-radius:99px;background:var(--p-primary)"></span><span style="width:6px;height:6px;border-radius:99px;background:var(--p-outline)"></span><span style="width:6px;height:6px;border-radius:99px;background:var(--p-outline)"></span></div>
+                <span class="btn filled">Next <svg class="ico-sm"><use href="#ic-chev"/></svg></span>
+              </div>
+            </div>
+          </div></div>
+          <p class="caption">Onboarding — 1 of 3, "Skip" top-right</p>
+        </div>
+      </div>
+      <dl class="screenspec">
+        <div><dt>Purpose</dt><dd>Establish identity in &lt;1s, then teach the mental model (items → combos → week) in three cards.</dd></div>
+        <div><dt>Primary goal</dt><dd>Understand the items → combos → week model, then create the first combo.</dd></div>
+        <div><dt>Main actions</dt><dd>Next / Skip; final card CTA "Add my first dish" opens the combo editor. Optional "Explore with 3 examples" adds clearly-labelled, deletable samples (not a bundled library).</dd></div>
+        <div><dt>Hierarchy</dt><dd>Illustration → headline → one line of copy → progress dots + CTA in thumb zone.</dd></div>
+        <div><dt>Navigation</dt><dd>Splash → onboarding (first run only) → combo editor (or This Week). Skip jumps straight to This Week.</dd></div>
+        <div><dt>Empty state</dt><dd>An empty library is intentional (your own dishes). The final card routes into creating one; This Week then shows "Add your first dish" until the library has combos.</dd></div>
+        <div><dt>Loading</dt><dd>Splash doubles as DB init; if &gt;600ms, hold splash with a subtle indeterminate bar.</dd></div>
+        <div><dt>Error</dt><dd>Optional-samples add fails → non-blocking snackbar "Couldn't add examples — add your own", proceed anyway.</dd></div>
+        <div><dt>Success</dt><dd>Lands in the combo editor ready to type the first dish; back-out reveals This Week.</dd></div>
+        <div><dt>Micro-interactions</dt><dd>Logo spring-scale; dot morphs into a pill for the active page; card content shared-axis slides.</dd></div>
+        <div><dt>Accessibility</dt><dd>Skip reachable first in focus order; dots have text alt "Step 1 of 3"; illustrations decorative (aria-hidden).</dd></div>
+        <div><dt>Edge cases</dt><dd>Returning user never sees onboarding again; re-triggerable from Settings ▸ Help.</dd></div>
+      </dl>
+    </div>
+
+    <!-- SCREEN 2: This Week -->
+    <div class="screenblock">
+      <h3><span class="n">02</span> This Week — home dashboard</h3>
+      <p class="muted" style="margin-top:8px;max-width:70ch">The heart of the app. Opens showing the current Sun–Sat plan already filled. One primary action; everything else is a light tap away.</p>
+      <div class="gallery" style="margin-top:20px">
+        <!-- filled state light -->
+        <div class="figpair">
+        <div class="phone"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="appbar large"><span class="over">JUL 5 – JUL 11 · THIS WEEK</span><div style="display:flex;width:100%;align-items:center;justify-content:space-between"><span class="title">This Week</span><svg class="ico" style="color:var(--p-mut)"><use href="#ic-set"/></svg></div></div>
+          <div class="scrbody" style="overflow:hidden">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <!-- Sunday -->
+              <div class="mcard" style="display:flex;gap:11px;align-items:center">
+                <div class="daychip"><small>SUN</small>5</div>
+                <div style="flex:1">
+                  <div class="slotlabel">Breakfast</div>
+                  <div style="font-weight:640;font-size:13.5px">Idly + Coconut Chutney</div>
+                </div>
+                <svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-swap"/></svg>
+              </div>
+              <!-- Monday with alert -->
+              <div class="mcard" style="display:flex;gap:11px;align-items:center;border-color:var(--p-tercont)">
+                <div class="daychip"><small>MON</small>6</div>
+                <div style="flex:1">
+                  <div class="slotlabel">Breakfast</div>
+                  <div style="font-weight:640;font-size:13.5px">Dosa + Coconut Chutney</div>
+                  <div style="margin-top:5px"><span class="alertpill"><svg class="ico-sm" style="width:12px;height:12px"><use href="#ic-history"/></svg>Coconut chutney · 1 day ago</span></div>
+                </div>
+                <svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-swap"/></svg>
+              </div>
+              <!-- Tuesday -->
+              <div class="mcard" style="display:flex;gap:11px;align-items:center">
+                <div class="daychip"><small>TUE</small>7</div>
+                <div style="flex:1">
+                  <div class="slotlabel">Breakfast</div>
+                  <div style="font-weight:640;font-size:13.5px">Pongal + Sambar</div>
+                </div>
+                <svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-swap"/></svg>
+              </div>
+              <!-- Wed blank -->
+              <div class="mcard" style="display:flex;gap:11px;align-items:center;border-style:dashed">
+                <div class="daychip" style="background:var(--p-surf2);color:var(--p-mut)"><small>WED</small>8</div>
+                <div style="flex:1">
+                  <div class="slotlabel">Breakfast</div>
+                  <div style="font-weight:600;font-size:13px;color:var(--p-outline)">Tap to fill · out of fresh combos</div>
+                </div>
+                <svg class="ico-sm" style="color:var(--p-primary)"><use href="#ic-add"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="fab ext"><svg class="ico-sm"><use href="#ic-swap"/></svg>Generate week</div>
+          <div class="navbar">
+            <div class="navitem active"><div class="pill"><svg class="ico-sm"><use href="#ic-cal"/></svg></div><span>This Week</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-bowl"/></svg></div><span>Combos</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-list"/></svg></div><span>Items</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-history"/></svg></div><span>History</span></div>
+          </div>
+        </div></div>
+        <p class="caption">Filled — note amber repeat alert &amp; dashed blank slot</p>
+        </div>
+
+        <!-- empty state dark -->
+        <div class="figpair">
+        <div class="phone phone--dark"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="appbar large"><span class="over">JUL 5 – JUL 11 · THIS WEEK</span><div style="display:flex;width:100%;align-items:center;justify-content:space-between"><span class="title">This Week</span><svg class="ico" style="color:var(--p-mut)"><use href="#ic-set"/></svg></div></div>
+          <div class="scrbody" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:0 26px">
+            <div style="width:96px;height:96px;border-radius:28px;background:var(--p-surf2);display:flex;align-items:center;justify-content:center"><svg style="width:48px;height:48px;color:var(--p-primary)"><use href="#ic-cal"/></svg></div>
+            <div style="font-size:19px;font-weight:680">No plan yet</div>
+            <p style="color:var(--p-mut);font-size:13px;margin:0">Generate a week from your combos, and swap anything you don't fancy.</p>
+            <div class="btn filled" style="margin-top:4px">Generate this week</div>
+          </div>
+          <div class="navbar">
+            <div class="navitem active"><div class="pill"><svg class="ico-sm"><use href="#ic-cal"/></svg></div><span>This Week</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-bowl"/></svg></div><span>Combos</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-list"/></svg></div><span>Items</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-history"/></svg></div><span>History</span></div>
+          </div>
+        </div></div>
+        <p class="caption">Empty state — dark theme</p>
+        </div>
+      </div>
+      <dl class="screenspec">
+        <div><dt>Purpose</dt><dd>Show the week's meals at a glance and make regenerating or tweaking trivial.</dd></div>
+        <div><dt>Primary goal</dt><dd>Know what to cook today without thinking; fix anything in one tap.</dd></div>
+        <div><dt>Main actions</dt><dd>Generate week (extended FAB) · tap a slot to swap/fill/clear · scroll days · open Settings.</dd></div>
+        <div><dt>Hierarchy</dt><dd>Date range overline → large "This Week" title → day cards (today emphasised) → FAB in thumb zone.</dd></div>
+        <div><dt>Navigation</dt><dd>Start destination. Slot tap → bottom sheet. Bottom nav to Combos/Items/History.</dd></div>
+        <div><dt>Empty state</dt><dd>Two distinct states: <b>(a) no dishes yet</b> → "Add your first dish" CTA (Generate would do nothing); <b>(b) dishes exist, no plan</b> → "No plan yet" + Generate (shown right, dark).</dd></div>
+        <div><dt>Loading</dt><dd>On Generate: day cards replaced by 3–4 skeleton rows, then fill top-to-bottom with 40ms stagger.</dd></div>
+        <div><dt>Error</dt><dd>Not enough fresh combos → slot renders as dashed "blank" with inline hint, never an error dialog.</dd></div>
+        <div><dt>Success</dt><dd>Staggered reveal of filled cards; today's card gets a brief primary-tinted highlight.</dd></div>
+        <div><dt>Micro-interactions</dt><dd>Swap icon rotates 180° on tap; amber alert pill fades in; FAB shrinks to icon-only on scroll-down, extends on scroll-up.</dd></div>
+        <div><dt>Accessibility</dt><dd>Each card is one focusable element: "Sunday breakfast, Idly and Coconut Chutney, repeated 1 day ago, double-tap to change." Alert conveyed in text, not colour alone.</dd></div>
+        <div><dt>Edge cases</dt><dd>Empty library → "add dishes" state, not Generate. Combos exist but none eligible for an enabled slot → those slots stay blank with a hint. Multiple enabled slots per day → cards group under a day header. Week rollover at Sun 00:00 → offer to generate next week.</dd></div>
+      </dl>
+    </div>
+
+    <!-- SCREEN 3: Slot bottom sheet -->
+    <div class="screenblock">
+      <h3><span class="n">03</span> Slot actions — bottom sheet</h3>
+      <p class="muted" style="margin-top:8px;max-width:70ch">Tapping any slot raises a modal bottom sheet: swap for another combo, fill a blank, or clear it. Repeat-risk is surfaced before the user commits.</p>
+      <div class="gallery" style="margin-top:20px">
+        <div class="figpair">
+        <div class="phone"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="scrbody" style="opacity:.5;padding-top:14px">
+            <div class="appbar large" style="padding-left:0"><span class="over">MON 6 · BREAKFAST</span><span class="title" style="font-size:22px">Choose a combo</span></div>
+            <div class="mcard" style="margin-bottom:8px;height:44px"></div><div class="mcard" style="height:44px"></div>
+          </div>
+          <div class="sheet" style="margin-top:-220px">
+            <div class="grab"></div>
+            <div style="font-size:15px;font-weight:680;margin-bottom:2px">Monday breakfast</div>
+            <div style="font-size:12px;color:var(--p-mut);margin-bottom:12px">Currently: Dosa + Coconut Chutney</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="mcard" style="display:flex;align-items:center;gap:10px"><svg class="ico-sm" style="color:var(--p-primary)"><use href="#ic-bowl"/></svg><div style="flex:1"><div style="font-weight:620;font-size:13px">Dosa + Tomato Chutney</div><div style="font-size:11px;color:var(--p-primary)">Fresh · no repeats</div></div><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-check"/></svg></div>
+              <div class="mcard" style="display:flex;align-items:center;gap:10px"><svg class="ico-sm" style="color:var(--p-primary)"><use href="#ic-bowl"/></svg><div style="flex:1"><div style="font-weight:620;font-size:13px">Idly + Coconut Chutney</div><div style="font-size:11px;color:var(--p-ontercont)"><span class="alertpill" style="padding:1px 7px">Coconut chutney · yesterday</span></div></div></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px"><span class="btn out" style="flex:1;justify-content:center">Clear slot</span><span class="btn filled" style="flex:1;justify-content:center">Swap</span></div>
+          </div>
+        </div></div>
+        <p class="caption">Swap sheet — fresh combos ranked first</p>
+        </div>
+        <div style="flex:1;min-width:260px">
+          <dl class="screenspec" style="margin-top:0">
+            <div><dt>Purpose</dt><dd>Change one slot without leaving the plan or losing context.</dd></div>
+            <div><dt>Primary goal</dt><dd>Replace with a combo the user actually wants tonight.</dd></div>
+            <div><dt>Main actions</dt><dd>Pick a combo · Clear slot · dismiss (drag down / scrim tap).</dd></div>
+            <div><dt>Hierarchy</dt><dd>Slot label → current dish → ranked combo list (fresh first, repeats flagged) → Clear / Swap.</dd></div>
+            <div><dt>Navigation</dt><dd>Modal over This Week; returns on select or dismiss. "＋ New combo" at list end deep-links to editor.</dd></div>
+            <div><dt>Empty state</dt><dd>No other combos for this slot → "No other combos yet" + "Create one".</dd></div>
+            <div><dt>Loading</dt><dd>Instant (local). No spinner.</dd></div>
+            <div><dt>Error</dt><dd>N/A — non-destructive until Swap.</dd></div>
+            <div><dt>Success</dt><dd>Sheet dismisses, slot animates the new name in, snackbar "Updated · Undo".</dd></div>
+            <div><dt>Micro-interactions</dt><dd>Sheet slides up (emphasized 300ms); scrim fades; selected row shows check + ripple.</dd></div>
+            <div><dt>Accessibility</dt><dd>Focus traps in sheet; Esc / back dismisses; repeat info spoken, not colour-only; 48dp rows.</dd></div>
+            <div><dt>Edge cases</dt><dd>Only repeating combos available → all show alerts, still selectable (soft rule). Very long combo lists scroll within the sheet.</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: Combos list + Item editor -->
+    <div class="screenblock">
+      <h3><span class="n">04</span> Combos, Items &amp; the Create/Edit flow</h3>
+      <p class="muted" style="margin-top:8px;max-width:70ch">Two library tabs share one pattern: searchable list, grouped content, FAB to add, tap to edit. A combo is built by naming it and tapping items; each item carries a role.</p>
+      <div class="gallery" style="margin-top:20px">
+        <!-- combos list -->
+        <div class="figpair">
+        <div class="phone"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="appbar large"><div style="display:flex;width:100%;align-items:center;justify-content:space-between"><span class="title">Combos</span><svg class="ico" style="color:var(--p-mut)"><use href="#ic-set"/></svg></div></div>
+          <div class="scrbody">
+            <div class="mcard" style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--p-surf1);border-color:transparent;margin-bottom:10px"><svg class="ico-sm" style="color:var(--p-mut)"><use href="#ic-search"/></svg><span style="color:var(--p-outline);font-size:12.5px">Search combos</span></div>
+            <div class="chiprow" style="margin-bottom:12px"><span class="mchip sel">All</span><span class="mchip">Breakfast</span><span class="mchip">Lunch</span><span class="mchip">Dinner</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="mcard" style="display:flex;align-items:center;gap:12px;padding:10px"><div style="flex:1"><div style="font-weight:640;font-size:13.5px">Idly + Coconut Chutney</div><div style="font-size:11px;color:var(--p-mut)">Base · Chutney · Breakfast</div></div><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-chev"/></svg></div>
+              <div class="mcard" style="display:flex;align-items:center;gap:12px;padding:10px"><div style="flex:1"><div style="font-weight:640;font-size:13.5px">Dosa + Sambar</div><div style="font-size:11px;color:var(--p-mut)">Base · Side · Breakfast</div></div><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-chev"/></svg></div>
+              <div class="mcard" style="display:flex;align-items:center;gap:12px;padding:10px"><div style="flex:1"><div style="font-weight:640;font-size:13.5px">Pongal + Sambar</div><div style="font-size:11px;color:var(--p-mut)">Base · Side · Breakfast</div></div><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-chev"/></svg></div>
+            </div>
+          </div>
+          <div class="fab"><svg class="ico"><use href="#ic-add"/></svg></div>
+          <div class="navbar">
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-cal"/></svg></div><span>This Week</span></div>
+            <div class="navitem active"><div class="pill"><svg class="ico-sm"><use href="#ic-bowl"/></svg></div><span>Combos</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-list"/></svg></div><span>Items</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-history"/></svg></div><span>History</span></div>
+          </div>
+        </div></div>
+        <p class="caption">Combos list — search, filter chips, FAB</p>
+        </div>
+
+        <!-- combo editor dark -->
+        <div class="figpair">
+        <div class="phone phone--dark"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="appbar"><svg class="ico" style="color:var(--p-ink)"><use href="#ic-back"/></svg><span class="title" style="font-size:19px;flex:1">New combo</span><span class="btn text" style="padding:6px 4px">Save</span></div>
+          <div class="scrbody" style="display:flex;flex-direction:column;gap:14px">
+            <div class="tfield focus"><span class="flab">Combo name</span><span>Idly + Coconut Chutney</span></div>
+            <div>
+              <div class="slotlabel" style="margin-bottom:8px">Items in this combo</div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <div class="mcard" style="display:flex;align-items:center;gap:9px;padding:10px"><span class="mchip role" style="font-size:10px;padding:3px 8px">Base</span><span style="flex:1;font-size:13px;font-weight:600">Idly</span><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-close"/></svg></div>
+                <div class="mcard" style="display:flex;align-items:center;gap:9px;padding:10px"><span class="mchip role" style="font-size:10px;padding:3px 8px">Chutney</span><span style="flex:1;font-size:13px;font-weight:600">Coconut Chutney</span><svg class="ico-sm" style="color:var(--p-outline)"><use href="#ic-close"/></svg></div>
+              </div>
+              <div class="btn out" style="margin-top:10px;width:100%;justify-content:center"><svg class="ico-sm"><use href="#ic-add"/></svg>Add item</div>
+            </div>
+            <div>
+              <div class="slotlabel" style="margin-bottom:8px">Meal slots</div>
+              <div class="chiprow"><span class="mchip sel"><svg class="ico-sm" style="width:12px;height:12px"><use href="#ic-check"/></svg>Breakfast</span><span class="mchip">Lunch</span><span class="mchip">Dinner</span></div>
+            </div>
+          </div>
+        </div></div>
+        <p class="caption">Combo editor — dark theme</p>
+        </div>
+      </div>
+      <dl class="screenspec">
+        <div><dt>Purpose</dt><dd>Curate the dish library that powers planning. Combos list = named meals; Items list = building blocks grouped by role.</dd></div>
+        <div><dt>Primary goal</dt><dd>Find, add, or edit a combo/item with minimal typing.</dd></div>
+        <div><dt>Main actions</dt><dd>Search · filter chips · tap row to edit · FAB to add · (editor) name, add/remove items, pick slots, Save.</dd></div>
+        <div><dt>Hierarchy</dt><dd>Search → filter → grouped list. Editor: name first, then composition, then slots.</dd></div>
+        <div><dt>Navigation</dt><dd>List → editor (container-transform from the tapped card / FAB). Back or Save returns. "Add item" opens an item picker sheet with inline "create new".</dd></div>
+        <div><dt>Empty state</dt><dd>No combos → friendly illustration, "Build your first combo", primary Add. No search results → "No combos match 'xyz'".</dd></div>
+        <div><dt>Loading</dt><dd>Local &amp; instant; skeleton rows only if a large import is still writing.</dd></div>
+        <div><dt>Error</dt><dd>Save with empty name → inline field error "Give this combo a name". Save with 0 items → helper "Add at least one item".</dd></div>
+        <div><dt>Success</dt><dd>Return to list, new/edited row highlights briefly, snackbar "Saved".</dd></div>
+        <div><dt>Micro-interactions</dt><dd>FAB → editor container transform; chip select springs; removing an item collapses the row; unsaved-changes back-guard.</dd></div>
+        <div><dt>Accessibility</dt><dd>Search has a clear label &amp; clear button; role chips announce state; remove buttons labelled "Remove Idly"; Save disabled state announced.</dd></div>
+        <div><dt>Edge cases</dt><dd>Duplicate combo name → allowed but warns. Deleting an item used in combos → confirm dialog listing affected combos. Deleting a role in use → confirm listing affected items/combos, offer reassign. Very long names truncate with ellipsis, full name in detail.</dd></div>
+      </dl>
+    </div>
+
+    <!-- SCREEN 5: History + Settings/Export -->
+    <div class="screenblock">
+      <h3><span class="n">05</span> History &amp; Settings (Export / Import)</h3>
+      <p class="muted" style="margin-top:8px;max-width:70ch">History is a calm, read-only record of past weeks that also powers repeat alerts. Settings houses the household prefs and the file-based share flow — export with a scope choice, import with a merge/replace choice.</p>
+      <div class="gallery" style="margin-top:20px">
+        <!-- history -->
+        <div class="figpair">
+        <div class="phone"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="appbar large"><span class="title">History</span></div>
+          <div class="scrbody">
+            <div class="slotlabel" style="margin:2px 0 8px">JUN 28 – JUL 4 · LAST WEEK</div>
+            <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px">
+              <div class="mcard" style="display:flex;gap:10px;padding:10px 12px"><span class="slotlabel" style="width:34px">Sun</span><span style="font-size:12.5px">Upma + Coconut Chutney</span></div>
+              <div class="mcard" style="display:flex;gap:10px;padding:10px 12px"><span class="slotlabel" style="width:34px">Mon</span><span style="font-size:12.5px">Idly + Sambar</span></div>
+              <div class="mcard" style="display:flex;gap:10px;padding:10px 12px"><span class="slotlabel" style="width:34px">Tue</span><span style="font-size:12.5px">Dosa + Tomato Chutney</span></div>
+            </div>
+            <div class="slotlabel" style="margin:2px 0 8px">JUN 21 – JUN 27</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div class="mcard" style="display:flex;gap:10px;padding:10px 12px"><span class="slotlabel" style="width:34px">Sun</span><span style="font-size:12.5px">Poori + Potato Masala</span></div>
+            </div>
+          </div>
+          <div class="navbar">
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-cal"/></svg></div><span>This Week</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-bowl"/></svg></div><span>Combos</span></div>
+            <div class="navitem"><div class="pill"><svg class="ico-sm"><use href="#ic-list"/></svg></div><span>Items</span></div>
+            <div class="navitem active"><div class="pill"><svg class="ico-sm"><use href="#ic-history"/></svg></div><span>History</span></div>
+          </div>
+        </div></div>
+        <p class="caption">History — grouped by week, read-only</p>
+        </div>
+
+        <!-- settings + export sheet dark -->
+        <div class="figpair">
+        <div class="phone phone--dark"><div class="scr">
+          <div class="statusbar"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="scrbody" style="opacity:.45;padding-top:8px">
+            <div class="appbar" style="padding-left:0"><svg class="ico"><use href="#ic-back"/></svg><span class="title" style="font-size:19px">Settings</span></div>
+            <div class="mcard" style="height:40px;margin-bottom:8px"></div><div class="mcard" style="height:40px"></div>
+          </div>
+          <div class="sheet" style="margin-top:-260px">
+            <div class="grab"></div>
+            <div style="font-size:16px;font-weight:680;margin-bottom:3px">Export dishes</div>
+            <p style="font-size:12px;color:var(--p-mut);margin:0 0 14px">Choose what to include, then share the file.</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="mcard" style="display:flex;align-items:center;gap:11px;border-color:var(--p-primary)"><div style="width:20px;height:20px;border-radius:50%;border:6px solid var(--p-primary)"></div><div style="flex:1"><div style="font-weight:620;font-size:13px">Dish library only</div><div style="font-size:11px;color:var(--p-mut)">Items, roles &amp; combos · best for sharing</div></div></div>
+              <div class="mcard" style="display:flex;align-items:center;gap:11px"><div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--p-outline)"></div><div style="flex:1"><div style="font-weight:620;font-size:13px">Library + plans &amp; history</div><div style="font-size:11px;color:var(--p-mut)">Full backup of everything</div></div></div>
+            </div>
+            <div class="btn filled" style="margin-top:14px;width:100%;justify-content:center"><svg class="ico-sm"><use href="#ic-share"/></svg>Export &amp; share</div>
+          </div>
+        </div></div>
+        <p class="caption">Export scope sheet — radios, then share</p>
+        </div>
+      </div>
+      <dl class="screenspec">
+        <div><dt>Purpose</dt><dd>History: remember and inform. Settings: tune the household and move data between phones.</dd></div>
+        <div><dt>Primary goal</dt><dd>History — recall recent meals. Settings — export the library to share with family / back up.</dd></div>
+        <div><dt>Main actions</dt><dd>History: scroll, tap a week to expand. Settings: toggle slots/reminders, set repeat window, Export, Import.</dd></div>
+        <div><dt>Hierarchy</dt><dd>History grouped newest-first by week. Settings grouped: Household · Planning · Reminders · Data · Help.</dd></div>
+        <div><dt>Navigation</dt><dd>Export → scope sheet → Android share sheet. Import → file picker → merge/replace dialog → result.</dd></div>
+        <div><dt>Empty state</dt><dd>History (new user): "Your cooked weeks will appear here." Nothing to export → Export disabled with reason.</dd></div>
+        <div><dt>Loading</dt><dd>Import shows determinate progress while writing rows; large files show a skeleton count-up.</dd></div>
+        <div><dt>Error</dt><dd>Corrupt/incompatible file → dialog "This file isn't a Meal Planner export" + how to get a valid one. Nothing overwritten on failure.</dd></div>
+        <div><dt>Success</dt><dd>Export → system share sheet opens. Import → snackbar "Added 12 combos, 20 items" (or "Replaced library").</dd></div>
+        <div><dt>Micro-interactions</dt><dd>Radio fills with a spring; switches slide; import progress bar fills; success check-draw on completion.</dd></div>
+        <div><dt>Accessibility</dt><dd>Radios grouped with a labelled fieldset; destructive "Replace" import styled as error &amp; requires explicit confirm; progress announces percent.</dd></div>
+        <div><dt>Edge cases</dt><dd>Import on top of existing data → merge skips exact duplicates, reports counts; Replace requires a second confirm. Newer file version → "Update the app to import this."</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MICRO ============ -->
+<section id="micro">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Delight, sparingly</p>
+      <h2>Micro-interactions worth building</h2>
+      <p>Each earns its place by making an action clearer or more satisfying — none are decoration. All respect reduced-motion.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><span class="kicker">Signature moment</span><h4>The week fills in</h4><p>On "Generate", day cards cascade in top-to-bottom (40ms stagger, emphasized-decelerate). It reads as the app doing the work for you.</p></div>
+      <div class="card"><span class="kicker">Swap</span><h4>Rotating swap icon</h4><p>The <code class="ic-code">swap_horiz</code> glyph spins 180° and the new dish name cross-fades up — a tiny confirmation the slot changed.</p></div>
+      <div class="card"><span class="kicker">Repeat alert</span><h4>Amber, then settle</h4><p>The alert pill fades + rises 4dp once when a repeat appears; it never pulses or nags after.</p></div>
+      <div class="card"><span class="kicker">FAB</span><h4>Extend on intent</h4><p>Extended "Generate week" collapses to icon-only on scroll-down, re-extends on scroll-up — content first, action within reach.</p></div>
+      <div class="card"><span class="kicker">Undo</span><h4>Forgiving deletes</h4><p>Delete animates the row out but holds the data for a 5s snackbar Undo before committing to the database.</p></div>
+      <div class="card"><span class="kicker">Editor</span><h4>Container transform</h4><p>Tapping a combo card / FAB expands it into the editor along a shared container — spatial continuity, no jarring cut.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANDROID ============ -->
+<section id="android">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Platform</p>
+      <h2>Android-specific UX best practices</h2>
+      <p>Design decisions that make this feel native to Android, not a ported iOS app.</p>
+    </div>
+    <div class="two">
+      <ul class="clean">
+        <li><b>Predictive back</b> — support Android 14+ predictive back gestures; back always dismisses sheets/dialogs before leaving a screen.</li>
+        <li><b>Edge-to-edge</b> — draw behind the status &amp; navigation bars; respect insets so content and FAB never hide under the gesture bar.</li>
+        <li><b>Material You</b> — adopt dynamic colour from wallpaper on Android 12+, with the curry-leaf palette as fallback; turmeric stays fixed as a semantic role.</li>
+        <li><b>System theme</b> — follow the OS light/dark setting automatically; offer a manual override in Settings.</li>
+        <li><b>One primary action</b> — a single FAB or filled button per screen, placed in the bottom-right thumb arc.</li>
+      </ul>
+      <ul class="clean">
+        <li><b>Bottom nav ergonomics</b> — 3–5 flat destinations, labels always visible, active item filled + tonal pill.</li>
+        <li><b>Adaptive layout</b> — bottom bar → navigation rail at ≥600dp; two-pane list/detail on tablets &amp; unfolded foldables.</li>
+        <li><b>Storage Access Framework</b> — export/import via the system file picker; no storage permissions needed.</li>
+        <li><b>Haptics</b> — light tick on generate-complete and destructive confirm; nothing gratuitous.</li>
+        <li><b>Back-guard</b> — unsaved editor changes prompt before discarding; snackbars, never blocking toasts, for feedback.</li>
+        <li><b>Touch targets</b> — every interactive element ≥48×48dp with ≥8dp separation.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HANDOFF ============ -->
+<section id="handoff" style="border-bottom:none">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">Design tokens &amp; handoff</p>
+      <h2>Ready for Figma or Compose</h2>
+      <p>The token set below maps 1:1 to Compose <code class="ic-code">MaterialTheme</code> / a Figma variable collection. Names follow Material 3 role conventions so they drop straight into <code class="ic-code">lightColorScheme()</code> / <code class="ic-code">darkColorScheme()</code>.</p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Token</th><th>Light</th><th>Dark</th><th>Type</th></tr></thead>
+        <tbody class="num">
+          <tr><td><code>md.sys.color.primary</code></td><td>#2F6B4F</td><td>#7FD3A2</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.on-primary</code></td><td>#FFFFFF</td><td>#00391E</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.primary-container</code></td><td>#B3F0CC</td><td>#125230</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.secondary-container</code></td><td>#D5E8D8</td><td>#37493C</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.tertiary</code> (turmeric)</td><td>#9A5B00</td><td>#FFB95C</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.tertiary-container</code></td><td>#FFDDB6</td><td>#734300</td><td>color</td></tr>
+          <tr><td><code>app.color.accent-coral</code> (custom)</td><td>#E14B5A</td><td>#FF7A85</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.error</code></td><td>#B3261E</td><td>#FFB4AB</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.surface</code> (warm)</td><td>#FAF7F3</td><td>#141210</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.surface-container</code></td><td>#F4F0EA</td><td>#232019</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.on-surface</code></td><td>#221F1B</td><td>#ECE7E0</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.on-surface-variant</code></td><td>#5C554D</td><td>#B7AFA4</td><td>color</td></tr>
+          <tr><td><code>md.sys.color.outline</code></td><td>#A79E93</td><td>#8A8175</td><td>color</td></tr>
+          <tr><td><code>md.sys.shape.corner-medium</code></td><td colspan="2">12dp</td><td>radius</td></tr>
+          <tr><td><code>md.sys.shape.corner-large</code></td><td colspan="2">16dp</td><td>radius</td></tr>
+          <tr><td><code>md.sys.shape.corner-extra-large</code></td><td colspan="2">28dp</td><td>radius</td></tr>
+          <tr><td><code>spacing.base / gutter</code></td><td colspan="2">8dp / 16dp</td><td>dimen</td></tr>
+          <tr><td><code>motion.duration.medium</code></td><td colspan="2">300ms · emphasized</td><td>motion</td></tr>
+          <tr><td><code>touch.target.min</code></td><td colspan="2">48×48dp</td><td>dimen</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card"><span class="kicker">Deliverable check</span><h4>Complete</h4><p>Palette · type scale · spacing · shape · elevation · motion · icons · component library · nav map · flows · 5 screen groups · tokens. ✓</p></div>
+      <div class="card"><span class="kicker">Deferred (v1 → v2)</span><h4>Parked, on purpose</h4><p>Balanced-variety algorithm, shopping list, ingredients, cloud sync — noted in REQUIREMENTS.md, out of this design.</p></div>
+      <div class="card"><span class="kicker">Next</span><h4>Build order</h4><p>Theme + tokens → nav scaffold → This Week → Combo/Item editors → Generate logic → History → Export/Import.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Family Meal Planner — Design System &amp; UX Specification v1.1 · Material Design 3, Airbnb-warmed · Kotlin + Jetpack Compose · Light &amp; Dark · Offline-first.
+    Companion to <b>REQUIREMENTS.md</b>. Toggle this page's theme to preview both colour schemes.
+  </div>
+</footer>
